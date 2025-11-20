@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reintroducing Rootsys.In</title>
+    <link rel="icon" href="./root-favicon.png" type="image/png" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
       rel="stylesheet"
@@ -46,13 +47,6 @@
         z-index: 100;
       }
 
-      /* 
-       * RESPONSIVENESS IMPROVEMENT:
-       * Use clamp() for fluid typography on welcome message.
-       * Min size: 1.8rem (28.8px) at smallest screens
-       * Preferred size: 5vw (scales with viewport width)
-       * Max size: 3rem (48px) for larger screens
-       */
       .welcome-sec p {
         font-size: clamp(1.8rem, 5vw, 3rem); /* min-28.8px, preferred-fluid, max-48px */
         text-align: center;
@@ -86,13 +80,6 @@
         overflow: hidden;
       }
 
-      /* 
-       * RESPONSIVENESS IMPROVEMENT:
-       * Use clamp() for fluid typography on main animated headings.
-       * Min size: 3rem (48px) for smallest screens
-       * Preferred size: 8vw + 2rem (fluid, biases towards larger base size)
-       * Max size: 6rem (96px) for larger screens (matches text-8xl default)
-       */
       .sec-one h1 {
         font-size: clamp(3rem, 8vw + 2rem, 6rem); /* min-48px, preferred-fluid, max-96px */
         line-height: 1.1; /* Ensure good line spacing */
@@ -120,15 +107,17 @@
 
       .glow-img {
         position: absolute;
-        top: -300px; /* Default for larger screens */
+        top: -200px;
         z-index: -1;
       }
 
       .watermark-wrapper {
         position: relative;
+        top: 10px;
+        padding: 4px 0 ;
         z-index: 10;
-        height: 200px; /* Default height for larger screens */
-        width: 100%;
+        height: 200px;
+        width: 100vw;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -136,23 +125,18 @@
         overflow: hidden;
         font-weight: 900;
         font-family: "Manrope", sans-serif;
-        /* 
-         * RESPONSIVENESS IMPROVEMENT:
-         * Use clamp() for fluid font-size for the watermark.
-         * Min size: 5rem (80px) for smallest screens
-         * Preferred size: 20vw + 1rem (very fluid for large text)
-         * Max size: 15.625rem (250px) for largest screens
-         */
         font-size: clamp(5rem, 20vw + 1rem, 15.625rem);
-        /* Default letter spacing for large screens, overridden by media queries */
         letter-spacing: -20px;
       }
 
       .watermark-wrapper .rootsys-watermark {
+        width: 100%;
+        /* position: absolute; */
+        /* top: -10px; */
         background: linear-gradient(
           to bottom,
-          rgba(255, 255, 255, 0.2),
-          rgba(0, 0, 0, 0.04)
+          rgba(255, 255, 255, 0.25),
+          rgba(0, 0, 0, 0.5)
         );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -168,7 +152,7 @@
 
       .sound-icon-wrapper {
         display: flex;
-        align-items: flex-end; /* Align bars to the bottom */
+        align-items: center; /* Align bars to the bottom */
         justify-content: center;
         gap: 3px;
         height: 20px; /* Default max height for bars */
@@ -218,7 +202,7 @@
       }
 
       /* ----------- SMALL DEVICES (mobiles) ----------- */
-      @media (max-width: 480px) {
+      @media screen and (max-width: 480px) {
         /* .welcome-sec p handled by clamp() */
 
         #lottie-logo {
@@ -227,7 +211,7 @@
         }
 
         .down-btn {
-          padding: 10px 18px;
+          padding: 10px 20px;
           transform: scale(0.9);
         }
 
@@ -237,7 +221,7 @@
         }
 
         .sec-two {
-          height: 250px; /* Adjusted height for small screens */
+          height: 100px!important; /* Adjusted height for small screens */
         }
 
         /* .watermark-wrapper font-size handled by clamp() */
@@ -247,7 +231,7 @@
         }
 
         .glow-img {
-          top: -150px; /* Adjusted position for small screens */
+          top: -50px; /* Adjusted position for small screens */
         }
 
         #audio-toggle-btn {
@@ -265,9 +249,15 @@
           width: 3px;
         }
       }
+/* 
+      @media screen and (max-width: 550px) {
+        .sec-two {
+          height: 100px;
+        }
+      } */
 
       /* ----------- MEDIUM DEVICES (tablets) ----------- */
-      @media (max-width: 768px) {
+      @media screen and (max-width: 768px) {
         /* .welcome-sec p handled by clamp() */
 
         #lottie-logo {
@@ -287,29 +277,34 @@
         }
 
         .glow-img {
-          top: -200px; /* Adjusted position for medium screens */
+          top: -50px; /* Adjusted position for medium screens */
         }
       }
-
+      
+      /* ----------- LARGE LAPTOPS (smooth scaling) ----------- */
+      @media (max-width: 950px) {
+        /* .sec-one h1 handled by clamp() */
+        .glow-img {
+          top: -150px !important;
+        }
+      }
       /* ----------- LARGE LAPTOPS (smooth scaling) ----------- */
       @media (max-width: 1024px) {
         /* .sec-one h1 handled by clamp() */
 
         /* .watermark-wrapper font-size handled by clamp() */
         .watermark-wrapper {
+
           letter-spacing: -15px; /* Specific letter-spacing for large screens */
         }
 
         .glow-img {
-          top: -220px; /* Adjusted position for large screens */
+          top: -200px;
         }
       }
     </style>
   </head>
   <body>
-    <!-- ====================================================== -->
-    <!-- AUDIO ELEMENT -->
-    <!-- ====================================================== -->
     <audio id="background-music" loop>
       <source src="./landing-audio-2.mpeg" type="audio/mpeg" />
       Your browser does not support the audio element.
@@ -383,6 +378,7 @@
         const audio = document.getElementById("background-music");
         const audioBtn = document.getElementById("audio-toggle-btn");
         const soundIconWrapper = audioBtn.querySelector(".sound-icon-wrapper");
+        const animatedTxt = document.querySelectorAll(".animated-text");
 
         // --- Welcome Screen Animation ---
         welcomeBtn.addEventListener("click", () => {
@@ -415,6 +411,15 @@
           }
         });
 
+        const isMobile = window.innerWidth < 768;
+
+        const initialY = isMobile ? 50 : 80;
+        const moveY = isMobile ? -50 : -80;
+        const secTwoStart = window.innerWidth < 480 ? "-100px" : window.innerWidth > 480 && window.innerWidth < 640 ? "-370px" : window.innerWidth > 640 && window.innerWidth < 768 ? "-340px" : window.innerWidth > 768 && window.innerWidth < 1024 ? "-370px" : "-400px";
+        const animatedTxtY = window.innerWidth < 480 ? 0 : window.innerWidth > 480 && window.innerWidth < 1024 ? -100 : -150;
+
+        console.log(secTwoStart);
+
         // --- Main Scroll Animation ---
         gsap.set("#we-are-text, #reintroducing-text", {
           opacity: 0,
@@ -422,14 +427,14 @@
           rotateX: -90,
           transformOrigin: "center center",
         });
-        gsap.set(".sec-two", { bottom: "-450px" });
+        gsap.set(".sec-two", { bottom: secTwoStart });
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: ".section-main",
             pin: ".sec-one",
             start: "top top",
-            end: "+=200%", // Scroll over 200% of the viewport height
+            end: "+=150%", // Scroll over 200% of the viewport height
             scrub: 1,
           },
         });
@@ -467,10 +472,20 @@
             "<"
           )
           .to(
+            animatedTxt,
+            {
+              // opacity: 1,
+              y: animatedTxtY,
+              // rotateX: 0,
+              duration: 1,
+            },
+            // "<"
+          )
+          .to(
             ".sec-two",
             {
               bottom: "0px",
-              duration: 2, // Slower duration for sec-two to slide up
+              duration: 1, // Slower duration for sec-two to slide up
             },
             "<"
           ); // Start sec-two animation with reintroducing-text
