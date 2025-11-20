@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reintroducing Rootsys.In</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://db.onlinewebfonts.com/c/23ed6ab5114b3c4b57abae46cf8a5029?family=PP+Editorial+New+Ultralight"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #000000;
+        color: #e0e0e0;
+        font-family: "PP Editorial New Ultralight";
+        overflow-x: hidden;
+        overflow-y: hidden; /* Start with scroll disabled */
+      }
+
+      .welcome-sec {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+      }
+
+      /* 
+       * RESPONSIVENESS IMPROVEMENT:
+       * Use clamp() for fluid typography on welcome message.
+       * Min size: 1.8rem (28.8px) at smallest screens
+       * Preferred size: 5vw (scales with viewport width)
+       * Max size: 3rem (48px) for larger screens
+       */
+      .welcome-sec p {
+        font-size: clamp(1.8rem, 5vw, 3rem); /* min-28.8px, preferred-fluid, max-48px */
+        text-align: center;
+        padding: 0 20px;
+      }
+
+      .section-main {
+        position: relative;
+      }
+
+      .down-btn {
+        border-radius: 50%;
+        padding: 15px 25px;
+        background: #2e2e2e;
+        border: 2px solid #3f3f3f;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .down-btn:hover {
+        background: #3f3f3f;
+      }
+
+      .sec-one {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        perspective: 800px;
+        overflow: hidden;
+      }
+
+      /* 
+       * RESPONSIVENESS IMPROVEMENT:
+       * Use clamp() for fluid typography on main animated headings.
+       * Min size: 3rem (48px) for smallest screens
+       * Preferred size: 8vw + 2rem (fluid, biases towards larger base size)
+       * Max size: 6rem (96px) for larger screens (matches text-8xl default)
+       */
+      .sec-one h1 {
+        font-size: clamp(3rem, 8vw + 2rem, 6rem); /* min-48px, preferred-fluid, max-96px */
+        line-height: 1.1; /* Ensure good line spacing */
+      }
+
+      .sec-two {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 350px; /* Default height for larger screens */
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: center;
+        z-index: 5;
+      }
+
+      .animated-text {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        z-index: 2;
+      }
+
+      .glow-img {
+        position: absolute;
+        top: -300px; /* Default for larger screens */
+        z-index: -1;
+      }
+
+      .watermark-wrapper {
+        position: relative;
+        z-index: 10;
+        height: 200px; /* Default height for larger screens */
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        overflow: hidden;
+        font-weight: 900;
+        font-family: "Manrope", sans-serif;
+        /* 
+         * RESPONSIVENESS IMPROVEMENT:
+         * Use clamp() for fluid font-size for the watermark.
+         * Min size: 5rem (80px) for smallest screens
+         * Preferred size: 20vw + 1rem (very fluid for large text)
+         * Max size: 15.625rem (250px) for largest screens
+         */
+        font-size: clamp(5rem, 20vw + 1rem, 15.625rem);
+        /* Default letter spacing for large screens, overridden by media queries */
+        letter-spacing: -20px;
+      }
+
+      .watermark-wrapper .rootsys-watermark {
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.2),
+          rgba(0, 0, 0, 0.04)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* Audio control button styling */
+      #audio-toggle-btn {
+        width: 56px; /* Default width/height for larger screens */
+        height: 56px;
+        bottom: 32px; /* Default position for larger screens */
+        right: 32px;
+      }
+
+      .sound-icon-wrapper {
+        display: flex;
+        align-items: flex-end; /* Align bars to the bottom */
+        justify-content: center;
+        gap: 3px;
+        height: 20px; /* Default max height for bars */
+        width: 24px; /* Default width of the icon */
+      }
+
+      .sound-icon-wrapper .bar {
+        display: inline-block;
+        width: 4px;
+        height: 4px; /* Paused state height */
+        background-color: #e0e0e0;
+        border-radius: 2px;
+        transition: height 0.3s ease-in-out;
+      }
+
+      .sound-icon-wrapper.playing .bar {
+        height: 20px; /* Full height when playing */
+        animation: animateSound 1.2s infinite ease-in-out alternate;
+      }
+
+      @keyframes animateSound {
+        0% {
+          transform: scaleY(0.2);
+        }
+        25% {
+          transform: scaleY(1);
+        }
+        50% {
+          transform: scaleY(0.4);
+        }
+        75% {
+          transform: scaleY(0.8);
+        }
+        100% {
+          transform: scaleY(0.2);
+        }
+      }
+
+      .sound-icon-wrapper.playing .bar:nth-child(2) {
+        animation-delay: -0.2s;
+      }
+      .sound-icon-wrapper.playing .bar:nth-child(3) {
+        animation-delay: -0.5s;
+      }
+      .sound-icon-wrapper.playing .bar:nth-child(4) {
+        animation-delay: -0.3s;
+      }
+
+      /* ----------- SMALL DEVICES (mobiles) ----------- */
+      @media (max-width: 480px) {
+        /* .welcome-sec p handled by clamp() */
+
+        #lottie-logo {
+          width: 140px;
+          height: 140px;
+        }
+
+        .down-btn {
+          padding: 10px 18px;
+          transform: scale(0.9);
+        }
+
+        /* .sec-one h1 handled by clamp() */
+        .animated-text {
+          padding: 0 10px; /* Keep padding for small screens */
+        }
+
+        .sec-two {
+          height: 250px; /* Adjusted height for small screens */
+        }
+
+        /* .watermark-wrapper font-size handled by clamp() */
+        .watermark-wrapper {
+          height: 120px; /* Adjusted height for small screens */
+          letter-spacing: -8px; /* Specific letter-spacing for small screens */
+        }
+
+        .glow-img {
+          top: -150px; /* Adjusted position for small screens */
+        }
+
+        #audio-toggle-btn {
+          width: 48px;
+          height: 48px;
+          bottom: 20px;
+          right: 20px;
+        }
+
+        .sound-icon-wrapper {
+          height: 14px;
+          width: 18px;
+        }
+        .sound-icon-wrapper .bar {
+          width: 3px;
+        }
+      }
+
+      /* ----------- MEDIUM DEVICES (tablets) ----------- */
+      @media (max-width: 768px) {
+        /* .welcome-sec p handled by clamp() */
+
+        #lottie-logo {
+          width: 190px;
+          height: 190px;
+        }
+
+        /* .sec-one h1 handled by clamp() */
+
+        .sec-two {
+          height: 300px; /* Adjusted height for medium screens */
+        }
+
+        /* .watermark-wrapper font-size handled by clamp() */
+        .watermark-wrapper {
+          letter-spacing: -12px; /* Specific letter-spacing for medium screens */
+        }
+
+        .glow-img {
+          top: -200px; /* Adjusted position for medium screens */
+        }
+      }
+
+      /* ----------- LARGE LAPTOPS (smooth scaling) ----------- */
+      @media (max-width: 1024px) {
+        /* .sec-one h1 handled by clamp() */
+
+        /* .watermark-wrapper font-size handled by clamp() */
+        .watermark-wrapper {
+          letter-spacing: -15px; /* Specific letter-spacing for large screens */
+        }
+
+        .glow-img {
+          top: -220px; /* Adjusted position for large screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ====================================================== -->
+    <!-- AUDIO ELEMENT -->
+    <!-- ====================================================== -->
+    <audio id="background-music" loop>
+      <source src="./landing-audio-2.mpeg" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+
+    <section
+      class="welcome-sec w-screen h-screen bg-[#111111] flex flex-col gap-12 items-center justify-center"
+    >
+      <div id="lottie-logo" class="w-60 h-60"></div>
+
+      <p>Welcome to Rootsys.in</p>
+      <button class="down-btn">
+        <img src="./down-arrow.svg" alt="Scroll Down" />
+      </button>
+    </section>
+
+    <section class="section-main">
+      <div class="sec-one">
+        <h1 class="animated-text" id="hello-text">Hello</h1>
+        <h1 class="animated-text" id="we-are-text">We are</h1>
+        <h1 class="animated-text" id="reintroducing-text">
+          Reintroducing
+        </h1>
+
+        <div class="sec-two">
+          <img
+            src="./wewe-svg.svg"
+            alt=""
+            style="width: 100%"
+            class="glow-img"
+          />
+          <div class="watermark-wrapper">
+            <h2 class="rootsys-watermark text-white/60">Rootsys.in</h2>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- FLOATING AUDIO CONTROL BUTTON -->
+    <!-- ====================================================== -->
+    <button
+      id="audio-toggle-btn"
+      class="hidden fixed z-[1000] bg-[#2e2e2e] border-2 border-[#3f3f3f] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#3f3f3f] transition-colors duration-300"
+    >
+      <div class="sound-icon-wrapper">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script>
+      lottie.loadAnimation({
+        container: document.getElementById("lottie-logo"),
+        renderer: "svg",
+        loop: false,
+        autoplay: true,
+        path: "./root.json", // 👉 Replace with your file name
+      });
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const welcomeBtn = document.querySelector(".down-btn");
+        const welcomeSec = document.querySelector(".welcome-sec");
+        const audio = document.getElementById("background-music");
+        const audioBtn = document.getElementById("audio-toggle-btn");
+        const soundIconWrapper = audioBtn.querySelector(".sound-icon-wrapper");
+
+        // --- Welcome Screen Animation ---
+        welcomeBtn.addEventListener("click", () => {
+          // Play audio and show the control button on first user interaction
+          // This is necessary to comply with browser autoplay policies.
+          audio.play();
+          soundIconWrapper.classList.add("playing"); // Start animation for bars
+          audioBtn.classList.remove("hidden"); // Show the audio button
+
+          gsap.to(welcomeSec, {
+            yPercent: -100,
+            duration: 1.2,
+            ease: "power3.inOut",
+            onComplete: () => {
+              welcomeSec.style.display = "none";
+              document.body.style.overflowY = "auto";
+              ScrollTrigger.refresh();
+            },
+          });
+        });
+
+        // --- Audio Button Click Listener ---
+        audioBtn.addEventListener("click", () => {
+          if (audio.paused) {
+            audio.play();
+            soundIconWrapper.classList.add("playing");
+          } else {
+            audio.pause();
+            soundIconWrapper.classList.remove("playing");
+          }
+        });
+
+        // --- Main Scroll Animation ---
+        gsap.set("#we-are-text, #reintroducing-text", {
+          opacity: 0,
+          y: 80,
+          rotateX: -90,
+          transformOrigin: "center center",
+        });
+        gsap.set(".sec-two", { bottom: "-450px" });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".section-main",
+            pin: ".sec-one",
+            start: "top top",
+            end: "+=200%", // Scroll over 200% of the viewport height
+            scrub: 1,
+          },
+        });
+
+        tl.to("#hello-text", {
+          opacity: 0,
+          y: -80,
+          rotateX: 90,
+          duration: 1,
+        })
+          .to(
+            "#we-are-text",
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1,
+            },
+            "<"
+          ) // Start this animation at the same time as the previous one ends
+          .to("#we-are-text", {
+            opacity: 0,
+            y: -80,
+            rotateX: 90,
+            duration: 1,
+          })
+          .to(
+            "#reintroducing-text",
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1,
+            },
+            "<"
+          )
+          .to(
+            ".sec-two",
+            {
+              bottom: "0px",
+              duration: 2, // Slower duration for sec-two to slide up
+            },
+            "<"
+          ); // Start sec-two animation with reintroducing-text
+      });
+    </script>
+  </body>
+</html>
